@@ -1,5 +1,7 @@
-# Brand name
+# Social Movie
 
+[Example Markdown](example.md)
+- - - -
 [Menu Item 1]()
 
   * # SubMenu Heading 1
@@ -15,3 +17,6 @@
 [Menu Item 2](item2.md)
 - - - -
 [Menu Item 3](item3.md)
+- - - -
+[gimmick:themechooser](Choose theme)
+[gimmick:theme](amelia)
