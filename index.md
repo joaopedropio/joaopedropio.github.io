@@ -1,19 +1,20 @@
-# Heading
-=======
+Welcome to the Social Movie Project!
+====================================
 
-SubHeading
-----------
+What is Social Movie?
+---------------------
 
-  * list item 1
-  * list item 2
+Social Movie is a fictional streaming web-site, where users can watch movies, make reviews and follow others, like a social-network. Imagine Netflix + Facebook + IMDb together!
 
-  This is a hyperlink to [Google](http://google.com).
+The propose of this site is to learn technologies like Node Js, Mongo DB, DotNet Core and micro services in general.
 
-  Images are like hyperlinks, but with an exclamation mark in front of them:
-  ![](http://placekitten.com/g/250/250)
+This site will never be done completetly. This is not the purpose of it. It will always be incremented and refactored as I learn more languages, tools and concepts.
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+What do we have so far?
+-----------------------
+
+The next diagram is an idea of how this system is going to be structured.
+
+![](socialmovie-diagram.png)
+
+Until now, just the [Front End](front-end.md), [Web Api Gateway](web-api-gateway.md) and User service ([User Api](user-api.md), [User Authentication](user-authentication.md) and [User Authorization](user-authorization.md)) are partly made.
