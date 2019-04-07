@@ -10,5 +10,6 @@
   * # Content
   * [Server](content-server.md)
   * [Authorizator](content-authorizator.md)
+  * [Web](content-manager-web.md)
 
 [gimmick:theme](cosmo)
