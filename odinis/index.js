@@ -7,7 +7,6 @@ function start() {
     next()
 }
 
-
 function next() {
     var picked = pickContext()
     showCurrentContexts(getCurrentContexts(), picked)
@@ -17,29 +16,33 @@ function showCurrentContexts(contexts, pickedContext) {
     var contextsElement = document.getElementById("ordinis");
     contextsElement.innerHTML = ""
     var list = document.createElement("ul")
+    list.className = "innerOrdinisList"
     contexts.forEach(context => {
         var item = document.createElement('li');
         item.appendChild(document.createTextNode(context));
+        item.className = "innerOrdinisListItem"
         list.appendChild(item);
     });
     contextsElement.appendChild(list)
-    contextsElement.appendChild(document.createTextNode("The context now is: " + pickedContext))
+    var currentContextText = document.createElement('p')
+    currentContextText.innerText = "The context now is: " + pickedContext
+    currentContextText.className = "contextNow"
+    contextsElement.appendChild(currentContextText)
 
     if (contexts.length == 0) {
         var restartButton = document.createElement('button');
         restartButton.innerHTML = "RESTART!"
+        restartButton.className = "restartButton"
         restartButton.onclick = start
         contextsElement.appendChild(restartButton)
     } else {
         var nextButton = document.createElement('button');
         nextButton.innerHTML = "NEXT!"
+        nextButton.className = "nextButton"
         nextButton.onclick = next
         contextsElement.appendChild(nextButton)
     }
 }
-
-//----------
-
 
 function initiateCurrentContexts() {
     setCurrentContexts(getContexts())
@@ -68,7 +71,7 @@ function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
-  }
+}
 
 function removeFromIndex(arr, index) {
     var newArr = []
@@ -79,8 +82,6 @@ function removeFromIndex(arr, index) {
     }
     return newArr
 }
-
-//-----------------
 
 function resetAllContexts() {
     localStorage.setItem("contexts", "[]")
@@ -138,9 +139,10 @@ function fillContexts() {
 
         var removeItem = document.createElement('button');
         removeItem.innerHTML = "X"
+        removeItem.className = "removeButton"
         removeItem.onclick = createFuncThatRemovesContextAndFill(i)
+        item.appendChild(removeItem)
         contextsElement.appendChild(item);
-        contextsElement.appendChild(removeItem)
     }
 }
 

@@ -31,7 +31,22 @@ const requestListener = function (req, res) {
     })
     return
   }
+  if (req.url == "/odinis/styles.css") {
+    fs.readFile(__dirname + "/styles.css")
+    .then(contents => {
+      res.setHeader("Content-Type", "text/css")
+      res.writeHead(200)
+      res.end(contents)
+    })
+    .catch(err => {
+      res.writeHead(500)
+      res.end(err)
+      return
+    })
+    return
+  }
 }
 
 const server = http.createServer(requestListener);
+console.log("Server on http://localhost:8080/odinis")
 server.listen(8080);

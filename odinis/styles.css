@@ -1,0 +1,96 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.child {
+    width: 40%;
+    height: 400px;
+    background-color: #eff2c0;
+    border: 1px solid black;
+}
+
+.addContextDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20% 0 5% 0;
+}
+
+.contextList {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.start {
+    margin: 30% auto;
+    display: block;
+}
+
+.innerOrdinisList {
+    margin: 10% 0 0 0 ;
+    display: block;
+}
+
+.innerOrdinisListItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.contextNow {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 3% 0 0 0 ;
+}
+
+.nextButton {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #bea57d;
+    margin: 3% auto;
+    display: block;
+}
+
+.restartButton {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #bea57d;
+    margin: 0 auto;
+    display: block;
+    margin: 3% auto;
+}
+
+.removeButton {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    color: red;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    margin: 0 0 0 10px ;
+}
