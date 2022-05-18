@@ -8,27 +8,62 @@ ul {
     list-style-type: none;
 }
 
+td {
+    color: white;
+    border-radius: 10px;
+    border-color: #1d4e6e;
+    background-color:1d4e6e !important;
+}
+
 .container {
-    height: 100%;
+    height: 80%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
 }
 
+.space {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 5%;
+    color: black;
+}
+
+.titleDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 15%;
+    color: black;
+    margin-bottom: 5%;
+}
+
+.title {
+    color: white;
+    font-size: 1000%;
+}
+
 .child {
     width: 40%;
-    height: 400px;
-    background-color: #eff2c0;
+    height: 75%;
+    margin-bottom: 10%;
     border: 1px solid black;
+    border-radius: 25px;
+    background-color: #27293D;
+}
+
+.division {
+    width: 5%;
+    height: 60%;
+    border-radius: 25px;
 }
 
 .addContextDiv {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 20% 0 5% 0;
+    width: 60%;
+    height: 60%;
+    margin: 20% 20%;
 }
 
 .contextList {
@@ -36,11 +71,15 @@ ul {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-top: 20%;
 }
 
-.start {
+.startButton {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     margin: 30% auto;
-    display: block;
 }
 
 .innerOrdinisList {
@@ -60,37 +99,28 @@ ul {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 3% 0 0 0 ;
+    margin-top: 10%;
 }
 
-.nextButton {
+.contextNowText {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #bea57d;
-    margin: 3% auto;
-    display: block;
-}
-
-.restartButton {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    background-color: #bea57d;
-    margin: 0 auto;
-    display: block;
-    margin: 3% auto;
+    margin-top: 6%;
 }
 
 .removeButton {
-    background-color: transparent;
-    background-repeat: no-repeat;
-    color: red;
-    border: none;
-    cursor: pointer;
-    overflow: hidden;
-    outline: none;
-    margin: 0 0 0 10px ;
+    border-radius: 10px;
+    background-color: #FA527A !important;
+}
+
+.nextRestartButton {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    display: block;
+    margin-top: 10%;
 }

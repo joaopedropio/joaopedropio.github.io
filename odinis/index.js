@@ -15,30 +15,46 @@ function next() {
 function showCurrentContexts(contexts, pickedContext) {
     var contextsElement = document.getElementById("ordinis");
     contextsElement.innerHTML = ""
-    var list = document.createElement("ul")
+    var table = document.createElement("table")
+    table.className = "table table-borderless contextNow"
+    var list = document.createElement("tbody")
     list.className = "innerOrdinisList"
     contexts.forEach(context => {
-        var item = document.createElement('li');
+        var tr = document.createElement('tr');
+        var item = document.createElement('td');
         item.appendChild(document.createTextNode(context));
         item.className = "innerOrdinisListItem"
-        list.appendChild(item);
+        tr.appendChild(item)
+        list.appendChild(tr);
     });
-    contextsElement.appendChild(list)
+    table.appendChild(list)
+    contextsElement.appendChild(table)
     var currentContextText = document.createElement('p')
-    currentContextText.innerText = "The context now is: " + pickedContext
+    currentContextText.innerText = "The context now is: "
     currentContextText.className = "contextNow"
+    currentContextText.style = "color: #CCCCCC;"
     contextsElement.appendChild(currentContextText)
+
+    var currentContextPicked = document.createElement('h1')
+    currentContextPicked.innerText = pickedContext
+    currentContextPicked.className = "contextNowText"
+    currentContextPicked.style = "color: #CCCCCC;"
+    contextsElement.appendChild(currentContextPicked)
 
     if (contexts.length == 0) {
         var restartButton = document.createElement('button');
         restartButton.innerHTML = "RESTART!"
-        restartButton.className = "restartButton"
+        restartButton.className = "btn btn-primary nextRestartButton"
+        restartButton.type = "button"
+        restartButton.style = "background: #29DCBF; color: #1E1E2B;"
         restartButton.onclick = start
         contextsElement.appendChild(restartButton)
     } else {
         var nextButton = document.createElement('button');
         nextButton.innerHTML = "NEXT!"
-        nextButton.className = "nextButton"
+        nextButton.className = "btn btn-primary nextRestartButton"
+        nextButton.type = "button"
+        nextButton.style = "background: #29DCBF; color: #1E1E2B;"
         nextButton.onclick = next
         contextsElement.appendChild(nextButton)
     }
@@ -134,15 +150,18 @@ function fillContexts() {
     contextsElement.innerHTML = ""
     for (i = 0; i < contexts.length; i++) {
         var context = contexts[i]
-        var item = document.createElement('li');
+        var tr = document.createElement('tr');
+        var item = document.createElement('td');
         item.appendChild(document.createTextNode(context));
+        tr.appendChild(item)
 
         var removeItem = document.createElement('button');
         removeItem.innerHTML = "X"
-        removeItem.className = "removeButton"
+        removeItem.type = "button"
+        removeItem.className = "btn btn-danger removeButton"
         removeItem.onclick = createFuncThatRemovesContextAndFill(i)
-        item.appendChild(removeItem)
-        contextsElement.appendChild(item);
+        tr.appendChild(removeItem)
+        contextsElement.appendChild(tr);
     }
 }
 
