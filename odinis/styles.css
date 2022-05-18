@@ -128,3 +128,17 @@ td {
     display: block;
     margin-top: 10%;
 }
+
+@media screen and (max-width: 1500px),
+       screen and (max-width: 800px) {
+    .title {
+        font-size: 500%;
+    }
+    .child {
+        width: 30%;
+        height: 80%;
+    }
+    .container {
+        height: 78%;
+    }
+}

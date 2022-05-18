@@ -6,29 +6,31 @@
     <script src="/odinis/index.js"></script>
 </head>
 <body style="background-color: #1E1E24;">
-    <div class="titleDiv">
-        <h1 class="title">ODINIS</h1>
-    </div>
-    <div class="space"></div>
-    <div class="container">
-        <div class="child">
-            <div class="addContextDiv">
-                <div class="input-group">
-                    <input type="text" class="form-control addContextInput" placeholder="Context Name" aria-label="Context Name" id="contextInput" aria-describedby="button-addon2">
-                    <button value="Add Context" class="btn btn-primary" type="button" style="background-color: #2C569D;" onclick="insertContext()">Add</button>
-                </div>
-                <div>
-                    <table class="table table-borderless contextList">
-                        <tbody id="contexts">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+    <div class="wholePage">
+        <div class="titleDiv">
+            <h1 class="title">ODINIS</h1>
         </div>
-        <div class="division"></div>
-        <div id="ordinis" class="child">
-            <input type="button" id="start" value="START!" class="btn btn-primary startButton" style="background-color: #29DCBF; color: #1E1E2B; border-color: #BAB9C1;" onclick="start()">
+        <div class="space"></div>
+        <div class="container">
+            <div class="child">
+                <div class="addContextDiv">
+                    <div class="input-group">
+                        <input type="text" class="form-control addContextInput" placeholder="Context Name" aria-label="Context Name" id="contextInput" aria-describedby="button-addon2">
+                        <button value="Add Context" class="btn btn-primary" type="button" style="background-color: #2C569D;" onclick="insertContext()">Add</button>
+                    </div>
+                    <div>
+                        <table class="table table-borderless contextList">
+                            <tbody id="contexts">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+    
+            </div>
+            <div class="division"></div>
+            <div id="ordinis" class="child">
+                <input type="button" id="start" value="START!" class="btn btn-primary startButton" style="background-color: #29DCBF; color: #1E1E2B; border-color: #BAB9C1;" onclick="start()">
+            </div>
         </div>
     </div>
 </body>
