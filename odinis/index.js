@@ -1,3 +1,8 @@
+function copyCurrentContextToClipboard() {
+    var copyText = document.getElementById("contextNowText");
+    navigator.clipboard.writeText(copyText.innerHTML);
+}
+
 function start() {
     if (getContexts().length == 0) {
         alert("Add some contexts before starting ordini.")
