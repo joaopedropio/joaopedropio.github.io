@@ -2,9 +2,9 @@
 <!--
   The Pac-Man dongle configurator.
 
-  Maintained in joaopedropio/zmk-pacman at docs/configurator/index.html, next
-  to the firmware it talks to.  Edit it there, run tools/pagetest/pagetest.mjs,
-  and copy it back here together with preview.js.
+  Maintained in joaopedropio/zmk-pacman-module at docs/configurator/index.html,
+  next to the firmware it talks to.  Edit it there, run
+  tools/pagetest/pagetest.mjs, and copy it back here together with preview.js.
 -->
 <html lang="en">
 <head>
@@ -223,6 +223,22 @@
   }
   nav button:hover:not(:disabled) { color: var(--ink); }
   nav button.on { color: var(--pac); border-bottom-color: var(--pac); }
+  /* the profile everything typed on this page lands in, at the far end of the
+     strip so it reads as a state the tabs are in rather than as another tab */
+  #onprofile {
+    margin-left: auto;
+    align-self: center;
+    border: none;
+    border-radius: 999px;
+    background: var(--rule);
+    padding: 5px 13px;
+    font-size: 12.5px;
+    color: var(--ink);
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  #onprofile b { color: var(--pac); font-weight: 600; }
+  #onprofile:hover:not(:disabled) { background: var(--edge); }
   .row.flash { animation: flash 1.4s ease-out; }
   @keyframes flash {
     from { background: var(--flash); }
@@ -250,6 +266,8 @@
   .profile:last-child { border-bottom: none; }
   .profile .name { color: var(--ink); }
   .profile.free .name { color: var(--dim); }
+  .profile.on { background: var(--rule); }
+  .profile.on .name { color: var(--pac); }
   .profile .note { display: block; font-size: 12px; color: var(--dim); }
   .profile .acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
   .profile .acts button { padding: 5px 10px; font-size: 13px; }
@@ -335,7 +353,7 @@ try {
   </footer>
 </main>
 
-<script src="preview.js?v=9a567f34568e"></script>
+<script src="preview.js?v=23d544bc86b0"></script>
 <script>
 "use strict";
 
@@ -354,7 +372,8 @@ const PROMPT_FALLBACK = "uart:~$";
  * up somewhere rather than nowhere.
  */
 const SCREENS = [
-  { name: "Game",      match: (n) => /^game-/.test(n) },
+  /* `game` picks which of the two, and everything game- draws one of them */
+  { name: "Game",      match: (n) => /^game($|-)/.test(n) },
   /* every splash- setting bar the two the Timing section claims first */
   { name: "Splash",    match: (n) => /^splash-/.test(n) },
   { name: "Dashboard", match: null },
@@ -396,8 +415,27 @@ function screenOf(name) {
   return SCREENS[2];
 }
 
+/*
+ * Settings the page has, writes and stores, but does not offer a control for.
+ * The theme number is the one: it picked between derived four-colour sets back
+ * when the dongle's button stepped through them, and that button now moves
+ * between profiles instead - so there is nowhere left to act on the number and
+ * a spinner for it was a control that led nowhere.  It is still written (every
+ * preset sets theme 0, which is what makes the individual colours count) and
+ * still reachable as `pacman set theme`.
+ */
+const UNOFFERED = /^theme$/;
+
+/*
+ * The first pattern to match wins, so the maze names its own colours and the
+ * shooter takes whatever game- is left.  Written that way round because the
+ * maze's list is finished and the shooter's is the one likely to grow: a
+ * colour added to it lands in its own group rather than under the wrong game.
+ */
 const GROUPS = [
-  ["The maze",        /^game-/],
+  ["Which game",      /^game$/],
+  ["The maze",        /^game-(bg|wall|house|door|pellet|pac|ghost|fright)/],
+  ["The starfield",   /^game-/],
   ["Layout",          /^(screen$|slot|battery-slots$|rotate$)/],
   ["Sound",           /^(mute$|volume$|bass-floor$|sample-rate$)/],
   ["Speed and timing", /^(frame-interval$|splash-frames$|splash-interval$|logo-interval$|wpm-slow$|wpm-fast$|theme-threshold$|mute-threshold$)/],
@@ -412,8 +450,12 @@ const GROUPS = [
 ];
 
 /*
- * The five that come with the page rather than with the dongle.  A preset is
- * only ever a handful of colours - never a layout, never a timing - so
+ * The five that come with the page rather than with the dongle.  Each has an
+ * opinion about both games, because the choice between them is a setting like
+ * any other and a look that only recoloured the maze would leave a dongle
+ * playing the shooter looking exactly as it did.  A preset is only ever a
+ * handful of colours - never a layout, never a timing, and never which game -
+ * so
  * applying one cannot leave a dongle needing a reboot to look like itself
  * again, and a setting it does not mention keeps whatever it had.  Names are
  * matched against whatever `pacman schema` reported, so a preset naming a
@@ -433,6 +475,10 @@ const PRESETS = [
       "game-pellet": "ffb897", "game-pac": "ffff00",
       "game-ghost-0": "ff0000", "game-ghost-1": "ffb8ff",
       "game-ghost-2": "00ffff", "game-ghost-3": "ffb852", "game-fright": "2121de",
+      "game-space": "000000", "game-star": "ffb897", "game-ship": "00ffff",
+      "game-ship-trim": "ffffff", "game-thruster": "ffb852", "game-bullet": "ffff00",
+      "game-meteor": "2121de", "game-meteor-edge": "6d6dff", "game-blast": "ff0000",
+      "game-powerup": "ffb8ff", "game-hud": "ffff00",
       "splash-logo": "ffff00", "splash-created-by": "ffb897", "splash-bg": "000000",
       "splash-multi-0": "ff0000", "splash-multi-1": "ffb8ff",
       "splash-multi-2": "00ffff", "splash-multi-3": "ffb852",
@@ -452,6 +498,10 @@ const PRESETS = [
       "game-pellet": "7dd3fc", "game-pac": "e0e7ff",
       "game-ghost-0": "f472b6", "game-ghost-1": "7dd3fc",
       "game-ghost-2": "a78bfa", "game-ghost-3": "38bdf8", "game-fright": "1e1b4b",
+      "game-space": "0b1020", "game-star": "7dd3fc", "game-ship": "7dd3fc",
+      "game-ship-trim": "e0e7ff", "game-thruster": "f472b6", "game-bullet": "e0e7ff",
+      "game-meteor": "1e1b4b", "game-meteor-edge": "4338ca", "game-blast": "f472b6",
+      "game-powerup": "a78bfa", "game-hud": "7dd3fc",
       "splash-logo": "7dd3fc", "splash-created-by": "a5b4fc", "splash-bg": "0b1020",
       "splash-multi-0": "f472b6", "splash-multi-1": "7dd3fc",
       "splash-multi-2": "a78bfa", "splash-multi-3": "38bdf8",
@@ -471,6 +521,10 @@ const PRESETS = [
       "game-pellet": "ffb000", "game-pac": "ffd980",
       "game-ghost-0": "ffb000", "game-ghost-1": "cc8800",
       "game-ghost-2": "996600", "game-ghost-3": "ffd980", "game-fright": "3d2400",
+      "game-space": "140c00", "game-star": "cc8800", "game-ship": "ffb000",
+      "game-ship-trim": "ffd980", "game-thruster": "ffd980", "game-bullet": "ffd980",
+      "game-meteor": "3d2400", "game-meteor-edge": "7a4a00", "game-blast": "ffb000",
+      "game-powerup": "ffd980", "game-hud": "ffb000",
       "splash-logo": "ffb000", "splash-created-by": "cc8800", "splash-bg": "140c00",
       "splash-multi-0": "ffb000", "splash-multi-1": "ffd980",
       "splash-multi-2": "cc8800", "splash-multi-3": "996600",
@@ -490,6 +544,10 @@ const PRESETS = [
       "game-pellet": "8bac0f", "game-pac": "9bbc0f",
       "game-ghost-0": "8bac0f", "game-ghost-1": "306230",
       "game-ghost-2": "9bbc0f", "game-ghost-3": "6b8c1f", "game-fright": "143a14",
+      "game-space": "0f380f", "game-star": "306230", "game-ship": "9bbc0f",
+      "game-ship-trim": "8bac0f", "game-thruster": "8bac0f", "game-bullet": "9bbc0f",
+      "game-meteor": "143a14", "game-meteor-edge": "306230", "game-blast": "8bac0f",
+      "game-powerup": "9bbc0f", "game-hud": "9bbc0f",
       "splash-logo": "9bbc0f", "splash-created-by": "8bac0f", "splash-bg": "0f380f",
       "splash-multi-0": "9bbc0f", "splash-multi-1": "8bac0f",
       "splash-multi-2": "306230", "splash-multi-3": "6b8c1f",
@@ -509,6 +567,10 @@ const PRESETS = [
       "game-pellet": "00e5ff", "game-pac": "fff200",
       "game-ghost-0": "ff2ec4", "game-ghost-1": "00e5ff",
       "game-ghost-2": "b026ff", "game-ghost-3": "ff6b00", "game-fright": "2a0a3d",
+      "game-space": "08000f", "game-star": "b026ff", "game-ship": "00e5ff",
+      "game-ship-trim": "ffffff", "game-thruster": "ff6b00", "game-bullet": "fff200",
+      "game-meteor": "2a0a3d", "game-meteor-edge": "b026ff", "game-blast": "ff2ec4",
+      "game-powerup": "00e5ff", "game-hud": "ff2ec4",
       "splash-logo": "ff2ec4", "splash-created-by": "00e5ff", "splash-bg": "08000f",
       "splash-multi-0": "ff2ec4", "splash-multi-1": "00e5ff",
       "splash-multi-2": "b026ff", "splash-multi-3": "fff200",
@@ -566,6 +628,9 @@ const PROFILE_FILE_VERSION = 1;
 /* seed 1 reaches this frame with all four ghosts out of the house and Pac-Man
  * in the open, which is the most of the palette anyone can click at once */
 const OPENING_FRAME = 354;
+/* and this one catches the shooter with a pickup drifting down and the engine
+ * lit, which are the two colours hardest to see on a frame picked at random */
+const SHOOTER_OPENING_FRAME = 300;
 const FRAME_MS = 66; /* about 15 fps, which is the speed the dongle plays it */
 
 let port = null, writer = null, incoming = "", prompt = PROMPT_FALLBACK;
@@ -573,6 +638,8 @@ let settings = [];
 let wasm = null, playing = null, screenIndex = 0, navIndex = 0;
 /* slots as the dongle last described them, and whether it knows the word at all */
 let profiles = [], profilesLive = false;
+/* the slot the dongle is on; there is always one, and slot 0 is the fallback */
+let onSlot = 0;
 
 const $ = (id) => document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -774,7 +841,14 @@ async function setValue(setting, word, quiet) {
       guardPreview("redrawing after a change", () => {
         pushSetting(setting);
         wasm._preview_apply_all();
-        renderScreen();
+        /*
+         * preview_step() only ever ticks the game that is showing, so the
+         * other one is still on its first frame - an empty sky, or a maze
+         * with nothing out of the house.  Switching between them therefore
+         * winds the new one on to its own opening rather than drawing it.
+         */
+        if (setting.name === "game" && previewScreen() === 0) rewind();
+        else renderScreen();
       });
     } else {
       await guardPreviewAsync("showing the new layout", rebootPreview);
@@ -988,12 +1062,14 @@ function render() {
 
   const section = SECTIONS[navIndex];
   const mine = settings.filter((setting) => {
+    if (UNOFFERED.test(setting.name)) return false;
     if (sectionOf(setting.name) !== section) return false;
     /* a slot this mode has not got is not a setting you can do anything with */
     if (SLOT_SETTING.test(setting.name) && !slotIsLive(setting.name)) return false;
     return section !== SECTIONS[0] || screenOf(setting.name) === SCREENS[screenIndex];
   });
-  $("count").textContent = mine.length + " of " + settings.length + " settings. ";
+  const offered = settings.filter((setting) => !UNOFFERED.test(setting.name)).length;
+  $("count").textContent = mine.length + " of " + offered + " settings. ";
 
   const order = GROUPS.map(([title]) => title).concat("Other");
   const byGroup = new Map();
@@ -1109,6 +1185,13 @@ async function rebootPreview() {
 function bootPreview() {
   const want = previewScreen();
   wasm._preview_set_screen(want === null ? screenIndex : want);
+  /*
+   * Not a setting - it is not stored, and no schema names it - but the slot
+   * widget draws it, so the module is told rather than left to make one up.
+   * That is the difference between this and the battery levels beside it:
+   * the page actually knows the answer.
+   */
+  wasm._preview_set_profile(onSlot);
   for (const setting of settings) pushSetting(setting);
   wasm._preview_apply_all();
   if (want === 0) rewind(); else renderScreen();
@@ -1179,6 +1262,23 @@ function buildNav() {
     button.addEventListener("click", () => setNav(i));
     strip.append(button);
   });
+
+  /*
+   * Which profile every change on this page lands in belongs beside the tabs
+   * rather than inside the one tab about profiles: it is true of the Screen
+   * tab and the Sound tab too, and somebody recolouring a maze is exactly the
+   * person who ought to know which look they are recolouring.
+   */
+  if (!profilesLive) return;
+  const chip = document.createElement("button");
+  chip.id = "onprofile";
+  chip.title = "The profile the dongle is on. Everything you change here goes into it.";
+  chip.textContent = "On ";
+  const named = document.createElement("b");
+  named.textContent = onProfileName();
+  chip.append(named);
+  chip.addEventListener("click", () => setNav(SECTIONS.findIndex((x) => x.view === "profiles")));
+  strip.append(chip);
 }
 
 function buildScreens() {
@@ -1221,10 +1321,17 @@ function setNav(index) {
   });
 }
 
+/* which game the dongle is on, and so which of the two openings to wind to */
+function playingShooter() {
+  const game = settings.find((setting) => setting.name === "game");
+  return !!game && game.value === "shooter";
+}
+
 function rewind() {
   if (screenIndex === 0) {
     wasm._preview_reset(1);
-    for (let i = 0; i < OPENING_FRAME; i++) wasm._preview_step();
+    const opening = playingShooter() ? SHOOTER_OPENING_FRAME : OPENING_FRAME;
+    for (let i = 0; i < opening; i++) wasm._preview_step();
     drawScreen();
     return;
   }
@@ -1428,6 +1535,17 @@ async function loadProfiles() {
       name: name === "-" ? "" : name,
       size: Number(size) || 0,
     }));
+
+    /*
+     * Asked for separately rather than read out of a fifth column, because a
+     * column is the half of that reply which cannot grow without breaking
+     * every page already written against it.  A firmware that answers `list`
+     * but not `current` predates the idea of being on one at all, so the
+     * fallback is the slot such a dongle would have been on: the first.
+     */
+    const here = parseTable(await exec("pacman profile current", "end"),
+                            "pacman profile current", 2);
+    onSlot = here && here.length ? Number(here[0][0]) : 0;
   } catch (err) {
     /* the settings still work without them, so this is not worth the status line */
   }
@@ -1505,9 +1623,27 @@ function firstFreeSlot() {
   return free ? free.slot : 0;
 }
 
-function askSlot(what) {
+/* the row for the slot the dongle is on, and what to call it before there is one */
+function onProfile() {
+  return profiles.find((profile) => profile.slot === onSlot) || null;
+}
+
+function onProfileName() {
+  const here = onProfile();
+  return here && here.name ? here.name : "slot " + onSlot;
+}
+
+/*
+ * `avoidCurrent` is for the writes that go through stage/commit.  Those build
+ * a record without touching the panel, and the slot the dongle is on answers
+ * out of the live settings instead of its record - so one written there would
+ * be dropped the moment the dongle moved off it.  The firmware refuses it;
+ * this is where it is kept out of reach, with the reason attached.
+ */
+function askSlot(what, avoidCurrent) {
   const listing = profiles
-    .map((profile) => "  " + profile.slot + "  " + (profile.name || "(free)"))
+    .map((profile) => "  " + profile.slot + "  " + (profile.name || "(free)") +
+                      (profile.slot === onSlot ? "   (the dongle is on this one)" : ""))
     .join("\n");
   const answer = ask(what + "\n\n" + listing + "\n\nWhich slot?", String(firstFreeSlot()));
   if (answer === null) return -1;
@@ -1516,6 +1652,11 @@ function askSlot(what) {
   const target = profiles.find((profile) => profile.slot === slot);
   if (!target) {
     say("There is no slot " + answer + " on this dongle.", "bad");
+    return -1;
+  }
+  if (avoidCurrent && slot === onSlot) {
+    say("The dongle is on slot " + slot + ", and that slot is whatever is on the panel — " +
+        "a profile written there would not survive. Pick another one.", "bad");
     return -1;
   }
   if (target.name && !agreed("Slot " + slot + " holds “" + target.name +
@@ -1564,44 +1705,114 @@ async function guardAction(fn) {
     say(err.message, "bad");
   }
   await loadProfiles();
+  /*
+   * The strip as well as the panel: half of what these buttons do is move the
+   * dongle from one profile to another, and the name beside the tabs is where
+   * that shows up on every tab but this one.
+   */
+  buildNav();
   render();
 }
 
+/*
+ * Sixty-odd colours straight into the profile the dongle is on, because that
+ * is what the live settings are - so this is the one button on the page that
+ * replaces a whole saved look rather than editing a corner of one, and it says
+ * so before it starts.  Duplicating first is the way to keep what is there.
+ */
 async function applyPreset(preset) {
+  if (profilesLive &&
+      !agreed("Apply “" + preset.name + "” over “" + onProfileName() + "”?\n\n" +
+              "The dongle is on “" + onProfileName() + "”, so these colours go into that " +
+              "profile and the ones it holds now are gone.\n\n" +
+              "Duplicate it first if you want to keep it.")) {
+    say("“" + onProfileName() + "” left as it was.");
+    return;
+  }
   say("Applying “" + preset.name + "”...");
   const { done, refused } = await writeValues(presetValues(preset),
                                               "Applying “" + preset.name + "”");
   await guardPreviewAsync("showing the preset", rebootPreview);
-  say("“" + preset.name + "” is on the dongle: " + done + " colours written" +
+  say("“" + preset.name + "” is on the dongle" +
+      (profilesLive ? ", as “" + onProfileName() + "”" : "") + ": " + done + " colours written" +
       (refused ? ", " + refused + " it would not take" : "") + ".", "good");
 }
 
 async function savePreset(preset) {
-  const slot = askSlot("Keep “" + preset.name + "” on the dongle as a profile.");
+  const slot = askSlot("Keep “" + preset.name + "” on the dongle as a profile.", true);
   if (slot < 0) return;
   const staged = await stageValues(slot, preset.name, presetValues(preset));
   say("“" + preset.name + "” saved to slot " + slot + " (" + staged + " settings).",
       "good");
 }
 
-async function saveCurrent(slot) {
-  const name = cleanName(ask("Call this profile:", "Slot " + slot));
-  if (!name) return;
-
+/*
+ * A snapshot of the live settings, which are the profile the dongle is on - so
+ * the slot it lands in holds the same look and the dongle goes on from there.
+ * That is what leaves the original alone: the next colour changed is a change
+ * to the copy.
+ */
+async function snapshotInto(slot, name) {
+  const leaving = onProfileName();
   const command = 'pacman profile save ' + slot + ' "' + name + '"';
   const reply = replyLines(await exec(command), command).join(" ");
   if (!/^saved/i.test(reply)) throw new Error(reply || "the dongle would not write that profile");
-  say("Everything the dongle is set to now is slot " + slot + ", as “" + name + "”.",
-      "good");
+  say("Slot " + slot + " is “" + name + "”, and the dongle is on it now. " +
+      "“" + leaving + "” keeps what it had.", "good");
 }
 
+async function saveCurrent(slot) {
+  const name = cleanName(ask("Call this profile:", "Slot " + slot));
+  if (!name) return;
+  await snapshotInto(slot, name);
+}
+
+async function duplicateProfile(profile) {
+  /*
+   * Copying the current profile is a snapshot, which any slot takes; copying
+   * another goes through stage/commit, which the current slot cannot hold.
+   */
+  const slot = askSlot("Copy “" + profile.name + "” into another slot.",
+                       profile.slot !== onSlot);
+  if (slot < 0) return;
+  if (slot === profile.slot) {
+    say("That is the slot it is already in.", "bad");
+    return;
+  }
+  const name = cleanName(ask("Call the copy:", profile.name + " copy"));
+  if (!name) return;
+
+  /*
+   * Copying the profile the dongle is on is a snapshot of the live settings,
+   * because those are that profile - and the dongle moves onto the copy, which
+   * is the whole point of taking one before changing anything.  Copying a
+   * profile it is not on goes through the stored record instead, and leaves
+   * the dongle where it is.
+   */
+  if (profile.slot === onSlot) {
+    await snapshotInto(slot, name);
+    return;
+  }
+
+  const staged = await stageValues(slot, name, await profileValues(profile.slot));
+  say("“" + name + "” is in slot " + slot + " with " + staged +
+      " settings. The dongle stays on “" + onProfileName() + "”.", "good");
+}
+
+/*
+ * Moving, not copying: the dongle writes down the profile it is leaving as the
+ * panel has it before the new values land, so an afternoon of edits is still
+ * there when you come back to it.
+ */
 async function loadProfile(profile) {
+  const leaving = onProfileName();
   const command = "pacman profile load " + profile.slot;
   const reply = replyLines(await exec(command), command).join(" ");
   if (!/^loaded/i.test(reply)) throw new Error(reply || "the dongle would not read that profile");
 
   await loadSchema();
-  say("“" + profile.name + "” is on the dongle. " + reply, "good");
+  say("The dongle is on “" + profile.name + "”; “" + leaving + "” is kept as it was. " +
+      reply, "good");
 }
 
 async function renameProfile(profile) {
@@ -1615,6 +1826,18 @@ async function renameProfile(profile) {
 }
 
 async function deleteProfile(profile) {
+  /*
+   * The firmware refuses both of these too.  Saying so here is about the
+   * reason rather than the rule: a page that only relayed "cannot be
+   * forgotten" would leave somebody hunting for a setting to turn off.
+   */
+  if (profile.slot === onSlot) {
+    throw new Error("The dongle is on “" + profile.name + "”. Move to another profile first.");
+  }
+  if (profile.slot === 0) {
+    throw new Error("The first profile is the one the dongle falls back to. " +
+                    "Rename it if you want it to be something else.");
+  }
   if (!agreed("Forget “" + profile.name + "”? The settings on the dongle stay as they " +
               "are; only the saved copy goes.")) {
     return;
@@ -1636,7 +1859,7 @@ async function exportProfile(profile) {
 
 async function importProfile(text) {
   const { name, values } = readProfileFile(text);
-  const slot = askSlot("Put “" + name + "” on the dongle.");
+  const slot = askSlot("Put “" + name + "” on the dongle.", true);
   if (slot < 0) return;
 
   const staged = await stageValues(slot, name, values);
@@ -1651,6 +1874,19 @@ function actionButton(label, title, fn) {
   button.textContent = label;
   button.title = title;
   button.addEventListener("click", () => guardAction(fn));
+  return button;
+}
+
+/*
+ * Shown and refused rather than left out.  A Delete that is simply missing
+ * from two of the rows reads as a page that forgot to draw it; one that is
+ * there and says why it will not go is the rule itself.
+ */
+function lockedButton(label, why) {
+  const button = document.createElement("button");
+  button.textContent = label;
+  button.title = why;
+  button.disabled = true;
   return button;
 }
 
@@ -1682,9 +1918,9 @@ function presetRow(preset) {
   const acts = document.createElement("div");
   acts.className = "acts";
   acts.append(
-    actionButton("Apply", "Write these colours to the dongle now",
+    actionButton("Apply", "Write these colours over the profile the dongle is on",
                  () => applyPreset(preset)),
-    actionButton("Save to dongle", "Keep it as a profile without changing anything now",
+    actionButton("Save to dongle", "Keep it in another slot without changing anything now",
                  () => savePreset(preset)));
 
   row.append(label, swatches, acts);
@@ -1692,8 +1928,9 @@ function presetRow(preset) {
 }
 
 function profileRow(profile) {
+  const here = profile.slot === onSlot;
   const row = document.createElement("div");
-  row.className = "profile" + (profile.name ? "" : " free");
+  row.className = "profile" + (profile.name ? "" : " free") + (here ? " on" : "");
 
   const label = document.createElement("div");
   const name = document.createElement("span");
@@ -1701,21 +1938,46 @@ function profileRow(profile) {
   name.textContent = profile.name || "Slot " + profile.slot + ", free";
   const note = document.createElement("span");
   note.className = "note";
-  note.textContent = profile.name
-    ? profile.size + (profile.size === 1 ? " setting" : " settings") + ", in slot " + profile.slot
-    : "nothing saved here";
+  note.textContent = !profile.name
+    ? "nothing saved here"
+    : here
+      ? "slot " + profile.slot + " — on the dongle now, so every change you make lands here"
+      : profile.size + (profile.size === 1 ? " setting" : " settings") + ", in slot " + profile.slot;
   label.append(name, note);
 
   const acts = document.createElement("div");
   acts.className = "acts";
   if (profile.name) {
+    /*
+     * The row the dongle is on offers no Load - it is already what the panel
+     * shows - and Duplicate in its place, which is how a look is kept before
+     * it is changed.  Delete stays on every row, refused where the dongle
+     * would otherwise be left on nothing.
+     */
+    if (!here) {
+      acts.append(actionButton("Load", "Move the dongle onto this profile",
+                               () => loadProfile(profile)));
+    }
     acts.append(
-      actionButton("Load", "Put these settings back on the dongle", () => loadProfile(profile)),
+      actionButton("Duplicate", here ? "Copy it into another slot and carry on from the copy"
+                                     : "Copy it into another slot",
+                   () => duplicateProfile(profile)),
       actionButton("Export", "Save it as a file", () => exportProfile(profile)),
-      actionButton("Rename", "Change what it is called", () => renameProfile(profile)),
-      actionButton("Delete", "Forget it", () => deleteProfile(profile)));
+      actionButton("Rename", "Change what it is called", () => renameProfile(profile)));
+
+    if (here) {
+      acts.append(lockedButton("Delete", "The dongle is on this profile; move to another first"));
+    } else if (profile.slot === 0) {
+      acts.append(lockedButton("Delete",
+                               "The first profile is the one the dongle falls back to; " +
+                               "rename it instead"));
+    } else {
+      acts.append(actionButton("Delete", "Forget it", () => deleteProfile(profile)));
+    }
   } else {
-    acts.append(actionButton("Save what is set now", "Snapshot every setting into this slot",
+    acts.append(actionButton("Save what is set now",
+                             "Copy the profile the dongle is on into this slot, and carry on " +
+                             "from the copy",
                              () => saveCurrent(profile.slot)));
   }
 
@@ -1723,25 +1985,38 @@ function profileRow(profile) {
   return row;
 }
 
-function panelSection(title) {
+function panelSection(title, about) {
   const section = document.createElement("section");
   const heading = document.createElement("h2");
   heading.textContent = title;
   const body = document.createElement("div");
   body.className = "rows";
-  section.append(heading, body);
+  section.append(heading);
+  if (about) {
+    const note = document.createElement("p");
+    note.className = "intro";
+    note.textContent = about;
+    section.append(note);
+  }
+  section.append(body);
   return { section, body };
 }
 
 function renderProfiles(panels) {
   const used = profiles.filter((profile) => profile.name).length;
-  $("count").textContent = used + " of " + profiles.length + " slots used. ";
+  $("count").textContent = used + " of " + profiles.length + " slots used, on “" +
+                           onProfileName() + "”. ";
 
   const presets = panelSection("Presets, from this page");
   for (const preset of PRESETS) presets.body.append(presetRow(preset));
   panels.append(presets.section);
 
-  const saved = panelSection("Saved on the dongle");
+  const saved = panelSection("Saved on the dongle",
+    "The dongle is always on one of these, and everything you change anywhere on this " +
+    "page goes straight into it — there is nothing here left unsaved. To keep a look " +
+    "before changing it, duplicate it and carry on from the copy. The first slot is the " +
+    "one the dongle falls back to: it can be renamed but not deleted, and neither can " +
+    "the one it is on.");
   for (const profile of profiles) saved.body.append(profileRow(profile));
 
   const importing = document.createElement("div");
@@ -1775,6 +2050,7 @@ function setConnected(on) {
   if (!on) {
     profiles = [];
     profilesLive = false;
+    onSlot = 0;
     if (SECTIONS[navIndex].view === "profiles") navIndex = 0;
     $("nav").textContent = "";
     $("panels").textContent = "";
@@ -1913,6 +2189,7 @@ $("rewind").addEventListener("click", () => { setPlaying(false); rewind(); });
 /* everything this page reaches for on the module, so a mismatch is named */
 const PREVIEW_NEEDS = ["_preview_panel", "_preview_framebuffer", "_preview_rgb565",
                        "_preview_set", "_preview_apply_all", "_preview_set_screen",
+                       "_preview_set_profile",
                        "_preview_render", "_preview_reset", "_preview_step", "_free",
                        "stringToNewUTF8"];
 
