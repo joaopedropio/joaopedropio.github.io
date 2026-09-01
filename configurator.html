@@ -353,7 +353,7 @@ try {
   </footer>
 </main>
 
-<script src="preview.js?v=f14fbfc9c33a"></script>
+<script src="preview.js?v=2608cfadc25a"></script>
 <script>
 "use strict";
 
@@ -427,14 +427,20 @@ function screenOf(name) {
 const UNOFFERED = /^theme$/;
 
 /*
- * The first pattern to match wins, so the maze names its own colours and the
- * shooter takes whatever game- is left.  Written that way round because the
- * maze's list is finished and the shooter's is the one likely to grow: a
- * colour added to it lands in its own group rather than under the wrong game.
+ * The first pattern to match wins, so four of the five games name their own
+ * colours and the shooter takes whatever game- is left.  Written that way
+ * round because those four lists are finished and the shooter's is the one
+ * likely to grow: a colour added to it lands in its own group rather than
+ * under the wrong game.  `game-hud` is the score on four of the five panels
+ * and falls to the shooter's group, which is where a reader will find it
+ * soonest.
  */
 const GROUPS = [
   ["Which game",      /^game$/],
   ["The maze",        /^game-(bg|wall|house|door|pellet|pac|ghost|fright)/],
+  ["The brick field", /^game-(floor|solid|brick|bomb|flame|foe|pickup|exit)/],
+  ["The ring",        /^game-(ring|fighter|spark|fireball|health)/],
+  ["The ridge",       /^game-(sky|hill|ground|hero|grunt|shot|grenade|boom|crate)/],
   ["The starfield",   /^game-/],
   ["Layout",          /^(screen$|slot|battery-slots$|rotate$)/],
   ["Sound",           /^(mute$|volume$|bass-floor$|sample-rate$)/],
@@ -451,9 +457,9 @@ const GROUPS = [
 
 /*
  * The five that come with the page rather than with the dongle.  Each has an
- * opinion about both games, because the choice between them is a setting like
- * any other and a look that only recoloured the maze would leave a dongle
- * playing the shooter looking exactly as it did.  A preset is only ever a
+ * opinion about all five games, because which one plays is a setting like any
+ * other and a look that only recoloured the maze would leave a dongle playing
+ * one of the others looking exactly as it did.  A preset is only ever a
  * handful of colours - never a layout, never a timing, and never which game -
  * so
  * applying one cannot leave a dongle needing a reboot to look like itself
@@ -479,6 +485,20 @@ const PRESETS = [
       "game-ship-trim": "ffffff", "game-thruster": "ffb852", "game-bullet": "ffff00",
       "game-meteor": "2121de", "game-meteor-edge": "6d6dff", "game-blast": "ff0000",
       "game-powerup": "ffb8ff", "game-hud": "ffff00",
+      "game-floor": "000000", "game-solid": "2121de", "game-brick": "ffb897",
+      "game-brick-edge": "000000", "game-bomb": "2121de", "game-flame": "ff0000",
+      "game-flame-hot": "ffff00", "game-bomber": "ffff00", "game-bomber-trim": "000000",
+      "game-foe": "ff0000", "game-foe-eye": "ffffff", "game-pickup": "00ffff",
+      "game-exit": "ffb8ff",
+      "game-ring": "000000", "game-ring-crowd": "2121de", "game-ring-floor": "ffb897",
+      "game-fighter-0": "ffffff", "game-fighter-0-trim": "ff0000",
+      "game-fighter-1": "ffff00", "game-fighter-1-trim": "2121de",
+      "game-spark": "ffffff", "game-fireball": "00ffff",
+      "game-health": "ffff00", "game-health-lost": "ff0000",
+      "game-sky": "000000", "game-hill": "2121de", "game-ground": "ffb897",
+      "game-ground-edge": "ffff00", "game-hero": "ffffff", "game-hero-trim": "2121de",
+      "game-grunt": "ff0000", "game-grunt-trim": "000000", "game-shot": "ffff00",
+      "game-grenade": "6d6dff", "game-boom": "ffb852", "game-crate": "00ffff",
       "splash-logo": "ffff00", "splash-created-by": "ffb897", "splash-bg": "000000",
       "splash-multi-0": "ff0000", "splash-multi-1": "ffb8ff",
       "splash-multi-2": "00ffff", "splash-multi-3": "ffb852",
@@ -502,6 +522,20 @@ const PRESETS = [
       "game-ship-trim": "e0e7ff", "game-thruster": "f472b6", "game-bullet": "e0e7ff",
       "game-meteor": "1e1b4b", "game-meteor-edge": "4338ca", "game-blast": "f472b6",
       "game-powerup": "a78bfa", "game-hud": "7dd3fc",
+      "game-floor": "0b1020", "game-solid": "4338ca", "game-brick": "1e1b4b",
+      "game-brick-edge": "0b1020", "game-bomb": "070b16", "game-flame": "f472b6",
+      "game-flame-hot": "e0e7ff", "game-bomber": "7dd3fc", "game-bomber-trim": "0b1020",
+      "game-foe": "f472b6", "game-foe-eye": "e0e7ff", "game-pickup": "a78bfa",
+      "game-exit": "38bdf8",
+      "game-ring": "0b1020", "game-ring-crowd": "1e1b4b", "game-ring-floor": "4338ca",
+      "game-fighter-0": "e0e7ff", "game-fighter-0-trim": "f472b6",
+      "game-fighter-1": "7dd3fc", "game-fighter-1-trim": "4338ca",
+      "game-spark": "e0e7ff", "game-fireball": "a78bfa",
+      "game-health": "7dd3fc", "game-health-lost": "f472b6",
+      "game-sky": "0b1020", "game-hill": "1e1b4b", "game-ground": "141a33",
+      "game-ground-edge": "4338ca", "game-hero": "e0e7ff", "game-hero-trim": "38bdf8",
+      "game-grunt": "f472b6", "game-grunt-trim": "070b16", "game-shot": "7dd3fc",
+      "game-grenade": "070b16", "game-boom": "a78bfa", "game-crate": "38bdf8",
       "splash-logo": "7dd3fc", "splash-created-by": "a5b4fc", "splash-bg": "0b1020",
       "splash-multi-0": "f472b6", "splash-multi-1": "7dd3fc",
       "splash-multi-2": "a78bfa", "splash-multi-3": "38bdf8",
@@ -525,6 +559,20 @@ const PRESETS = [
       "game-ship-trim": "ffd980", "game-thruster": "ffd980", "game-bullet": "ffd980",
       "game-meteor": "3d2400", "game-meteor-edge": "7a4a00", "game-blast": "ffb000",
       "game-powerup": "ffd980", "game-hud": "ffb000",
+      "game-floor": "140c00", "game-solid": "7a4a00", "game-brick": "3d2400",
+      "game-brick-edge": "140c00", "game-bomb": "0a0600", "game-flame": "ffb000",
+      "game-flame-hot": "ffd980", "game-bomber": "ffd980", "game-bomber-trim": "140c00",
+      "game-foe": "cc8800", "game-foe-eye": "ffd980", "game-pickup": "ffb000",
+      "game-exit": "ffd980",
+      "game-ring": "140c00", "game-ring-crowd": "3d2400", "game-ring-floor": "7a4a00",
+      "game-fighter-0": "ffd980", "game-fighter-0-trim": "ffb000",
+      "game-fighter-1": "cc8800", "game-fighter-1-trim": "7a4a00",
+      "game-spark": "ffd980", "game-fireball": "ffb000",
+      "game-health": "ffb000", "game-health-lost": "7a4a00",
+      "game-sky": "140c00", "game-hill": "3d2400", "game-ground": "231400",
+      "game-ground-edge": "7a4a00", "game-hero": "ffd980", "game-hero-trim": "cc8800",
+      "game-grunt": "cc8800", "game-grunt-trim": "140c00", "game-shot": "ffd980",
+      "game-grenade": "0a0600", "game-boom": "ffb000", "game-crate": "ffd980",
       "splash-logo": "ffb000", "splash-created-by": "cc8800", "splash-bg": "140c00",
       "splash-multi-0": "ffb000", "splash-multi-1": "ffd980",
       "splash-multi-2": "cc8800", "splash-multi-3": "996600",
@@ -548,6 +596,20 @@ const PRESETS = [
       "game-ship-trim": "8bac0f", "game-thruster": "8bac0f", "game-bullet": "9bbc0f",
       "game-meteor": "143a14", "game-meteor-edge": "306230", "game-blast": "8bac0f",
       "game-powerup": "9bbc0f", "game-hud": "9bbc0f",
+      "game-floor": "0f380f", "game-solid": "6b8c1f", "game-brick": "306230",
+      "game-brick-edge": "143a14", "game-bomb": "081c08", "game-flame": "8bac0f",
+      "game-flame-hot": "9bbc0f", "game-bomber": "9bbc0f", "game-bomber-trim": "0f380f",
+      "game-foe": "8bac0f", "game-foe-eye": "0f380f", "game-pickup": "9bbc0f",
+      "game-exit": "9bbc0f",
+      "game-ring": "0f380f", "game-ring-crowd": "143a14", "game-ring-floor": "306230",
+      "game-fighter-0": "9bbc0f", "game-fighter-0-trim": "0f380f",
+      "game-fighter-1": "6b8c1f", "game-fighter-1-trim": "081c08",
+      "game-spark": "9bbc0f", "game-fireball": "8bac0f",
+      "game-health": "9bbc0f", "game-health-lost": "306230",
+      "game-sky": "0f380f", "game-hill": "143a14", "game-ground": "306230",
+      "game-ground-edge": "8bac0f", "game-hero": "9bbc0f", "game-hero-trim": "0f380f",
+      "game-grunt": "6b8c1f", "game-grunt-trim": "081c08", "game-shot": "9bbc0f",
+      "game-grenade": "081c08", "game-boom": "8bac0f", "game-crate": "9bbc0f",
       "splash-logo": "9bbc0f", "splash-created-by": "8bac0f", "splash-bg": "0f380f",
       "splash-multi-0": "9bbc0f", "splash-multi-1": "8bac0f",
       "splash-multi-2": "306230", "splash-multi-3": "6b8c1f",
@@ -571,6 +633,20 @@ const PRESETS = [
       "game-ship-trim": "ffffff", "game-thruster": "ff6b00", "game-bullet": "fff200",
       "game-meteor": "2a0a3d", "game-meteor-edge": "b026ff", "game-blast": "ff2ec4",
       "game-powerup": "00e5ff", "game-hud": "ff2ec4",
+      "game-floor": "08000f", "game-solid": "b026ff", "game-brick": "2a0a3d",
+      "game-brick-edge": "08000f", "game-bomb": "040008", "game-flame": "ff6b00",
+      "game-flame-hot": "fff200", "game-bomber": "00e5ff", "game-bomber-trim": "08000f",
+      "game-foe": "ff2ec4", "game-foe-eye": "ffffff", "game-pickup": "00e5ff",
+      "game-exit": "fff200",
+      "game-ring": "08000f", "game-ring-crowd": "2a0a3d", "game-ring-floor": "b026ff",
+      "game-fighter-0": "00e5ff", "game-fighter-0-trim": "ff2ec4",
+      "game-fighter-1": "fff200", "game-fighter-1-trim": "b026ff",
+      "game-spark": "ffffff", "game-fireball": "ff2ec4",
+      "game-health": "00e5ff", "game-health-lost": "ff2ec4",
+      "game-sky": "08000f", "game-hill": "2a0a3d", "game-ground": "1a0020",
+      "game-ground-edge": "b026ff", "game-hero": "00e5ff", "game-hero-trim": "ff2ec4",
+      "game-grunt": "ff2ec4", "game-grunt-trim": "08000f", "game-shot": "fff200",
+      "game-grenade": "040008", "game-boom": "ff6b00", "game-crate": "00e5ff",
       "splash-logo": "ff2ec4", "splash-created-by": "00e5ff", "splash-bg": "08000f",
       "splash-multi-0": "ff2ec4", "splash-multi-1": "00e5ff",
       "splash-multi-2": "b026ff", "splash-multi-3": "fff200",
@@ -631,6 +707,17 @@ const OPENING_FRAME = 354;
 /* and this one catches the shooter with a pickup drifting down and the engine
  * lit, which are the two colours hardest to see on a frame picked at random */
 const SHOOTER_OPENING_FRAME = 300;
+/* and this one catches the brick field with a blast going off, two fuses
+ * burning and a pickup uncovered beside them, which is the only way to get
+ * both flame colours and the ground under a wall that is no longer there into
+ * the same frame - it is the frame of the first nine hundred that shows the
+ * most distinct colours at once, which is how it was picked */
+const BOMBER_OPENING_FRAME = 118;
+/* the ring, on the frame with the most of its palette on it: both fighters
+ * mid-exchange with a bar that has moved and a round already on the card */
+const FIGHTER_OPENING_FRAME = 127;
+/* and the ridge, with a step, a hole and the trooper over one of them */
+const COMMANDO_OPENING_FRAME = 71;
 const FRAME_MS = 66; /* about 15 fps, which is the speed the dongle plays it */
 
 let port = null, writer = null, incoming = "", prompt = PROMPT_FALLBACK;
@@ -1321,16 +1408,26 @@ function setNav(index) {
   });
 }
 
-/* which game the dongle is on, and so which of the two openings to wind to */
-function playingShooter() {
+/*
+ * Which game the dongle is on, and so which opening to wind to.  Each of them
+ * has one frame that shows the most of its own palette at once, and they are
+ * nothing like each other - so the strip below picks by name rather than
+ * counting, and a game whose word this page has never heard of gets the maze's.
+ */
+const OPENINGS = {
+  pacman: OPENING_FRAME, shooter: SHOOTER_OPENING_FRAME, bomber: BOMBER_OPENING_FRAME,
+  fighter: FIGHTER_OPENING_FRAME, commando: COMMANDO_OPENING_FRAME,
+};
+
+function openingFrame() {
   const game = settings.find((setting) => setting.name === "game");
-  return !!game && game.value === "shooter";
+  return (game && OPENINGS[game.value]) || OPENING_FRAME;
 }
 
 function rewind() {
   if (screenIndex === 0) {
     wasm._preview_reset(1);
-    const opening = playingShooter() ? SHOOTER_OPENING_FRAME : OPENING_FRAME;
+    const opening = openingFrame();
     for (let i = 0; i < opening; i++) wasm._preview_step();
     drawScreen();
     return;
