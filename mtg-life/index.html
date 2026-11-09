@@ -366,8 +366,7 @@ async function connect() {
 async function refreshInfo() {
   const r = await cmd([0x01]);
   info = { ver: r[1], slots: r[2], mask: r[3], theme: r[4], builtin: r[5], enabled: !!r[6], mtu: r.length > 7 ? r[7] : 0 };
-  // a write without response bigger than MTU-3 is dropped silently on iOS (Bluefy keeps MTU 23)
-  if (info.mtu >= 23) chunk = Math.min(180, info.mtu - 3);
+  if (info.mtu >= 23) chunk = Math.min(180, info.mtu - 3);   // a write never goes past MTU-3
   renderStatus();
 }
 
@@ -376,9 +375,41 @@ async function selectTheme(i) {
   try { await cmd([0x05, i]); await refreshInfo(); } catch (e) { log(e.message, 'err'); }
 }
 
-async function writeData(bytes) {
-  if (data.writeValueWithoutResponse) await data.writeValueWithoutResponse(bytes);
+// Bluefy (iPhone/iPad) resolves writeValueWithoutResponse but never sends anything, so iOS
+// uses writes with response from the start (slower: one round trip per write). Anywhere
+// else, an upload whose first page is never acknowledged is retried once that way.
+const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+async function writeData(bytes, withResponse) {
+  if (withResponse) {
+    if (data.writeValueWithResponse) await data.writeValueWithResponse(bytes);
+    else await data.writeValue(bytes);
+  } else if (data.writeValueWithoutResponse) await data.writeValueWithoutResponse(bytes);
   else await data.writeValue(bytes);
+}
+
+async function sendRecord(slot, rec, withResponse) {
+  const size = rec.length;
+  for (let i = inbox.length - 1; i >= 0; i--) if (inbox[i][0] === 0x03) inbox.splice(i, 1);   // stale acks
+  await cmd([0x02, slot, size & 255, (size >> 8) & 255, (size >> 16) & 255, size >>> 24], 20000);
+  const step = withResponse ? Math.min(244, info.mtu >= 23 ? info.mtu - 3 : 20) : chunk;
+  let sent = 0, acked = 0;
+  const WINDOW = 8192;
+  while (acked < size) {
+    while (sent < size && sent - acked < WINDOW) {
+      const part = rec.subarray(sent, Math.min(size, sent + step));
+      try { await writeData(part, withResponse); }
+      catch (e) { if (!withResponse && chunk > 20) { chunk = 20; continue; } throw e; }
+      sent += part.length;
+    }
+    let r;
+    try { r = await nextMsg(m => m[0] === 0x03 || m[0] === 0x7F, 10000); }
+    catch (e) { if (acked === 0 && !withResponse) e.noData = true; throw e; }
+    if (r[0] === 0x7F) throw new Error('o aparelho recusou os dados (erro ' + r[1] + ')');
+    acked = r[1] | (r[2] << 8) | (r[3] << 16) | (r[4] << 24);
+    $('prog').value = acked / size;
+    log(`Enviando… ${Math.round(acked / 1024)} de ${Math.round(size / 1024)} KB`);
+  }
 }
 
 async function upload(slot) {
@@ -388,22 +419,14 @@ async function upload(slot) {
   btns.forEach(b => b.disabled = true);
   try {
     log('Preparando o espaço ' + (slot + 1) + '…');
-    const size = rec.length;
-    await cmd([0x02, slot, size & 255, (size >> 8) & 255, (size >> 16) & 255, size >>> 24], 20000);
-    let sent = 0, acked = 0;
-    const t0 = performance.now(), WINDOW = 8192;
-    while (acked < size) {
-      while (sent < size && sent - acked < WINDOW) {
-        const part = rec.subarray(sent, Math.min(size, sent + chunk));
-        try { await writeData(part); }
-        catch (e) { if (chunk > 20) { chunk = 20; continue; } throw e; }
-        sent += part.length;
-      }
-      const r = await nextMsg(m => m[0] === 0x03 || m[0] === 0x7F, 10000);
-      if (r[0] === 0x7F) throw new Error('o aparelho recusou os dados (erro ' + r[1] + ')');
-      acked = r[1] | (r[2] << 8) | (r[3] << 16) | (r[4] << 24);
-      $('prog').value = acked / size;
-      log(`Enviando… ${Math.round(acked / 1024)} de ${Math.round(size / 1024)} KB`);
+    const t0 = performance.now();
+    try {
+      await sendRecord(slot, rec, IOS);
+    } catch (e) {
+      if (!e.noData) throw e;
+      log('Nada chegou ao aparelho; tentando de novo no modo mais lento…');
+      $('prog').value = 0;
+      await sendRecord(slot, rec, true);
     }
     const end = await cmd([0x04], 10000);
     if (end[1] !== 0) throw new Error('a verificação no aparelho falhou');
