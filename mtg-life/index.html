@@ -365,7 +365,9 @@ async function connect() {
 
 async function refreshInfo() {
   const r = await cmd([0x01]);
-  info = { ver: r[1], slots: r[2], mask: r[3], theme: r[4], builtin: r[5], enabled: !!r[6] };
+  info = { ver: r[1], slots: r[2], mask: r[3], theme: r[4], builtin: r[5], enabled: !!r[6], mtu: r.length > 7 ? r[7] : 0 };
+  // a write without response bigger than MTU-3 is dropped silently on iOS (Bluefy keeps MTU 23)
+  if (info.mtu >= 23) chunk = Math.min(180, info.mtu - 3);
   renderStatus();
 }
 
